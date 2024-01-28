@@ -16,7 +16,7 @@ class SignInData(BaseModel):
     email: str
     password: str
 
-# Get the token
+# Get the role
 @router.get("/getrole")
 async def getRole(payload: dict = Depends(getCurrentUserData)):
     try:
@@ -76,5 +76,21 @@ async def signIn(signInData: SignInData, response: Response):
     except Exception as e:
         logging.error("Error during sign-in: %s", str(e))
         raise HTTPException(status_code=500, detail=f"Internal Server Error:{str(e)}")
+    
+    # Logout
 
+# LogOut
+@router.post("/logout")
+async def logOut(response: Response):
+    try:
+        response = Response(content="Logout successful", media_type="text/plain")
+        response.delete_cookie(key="LoggedInToken")
+        return response
 
+    except HTTPException as http_exception:
+        raise http_exception
+
+    except Exception as e:
+        error_detail = f"An error occurred during logout: {str(e)}"
+        print(error_detail)
+        raise HTTPException(status_code=500, detail=error_detail)
